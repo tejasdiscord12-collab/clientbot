@@ -16,6 +16,8 @@ module.exports = {
             }
         });
 
+        await client.refreshGuildCommands();
+
         client.user.setPresence({
             activities: [{ name: '/help | Nexter Cloud', type: ActivityType.Watching }],
             status: 'online'

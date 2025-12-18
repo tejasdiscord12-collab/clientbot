@@ -28,18 +28,21 @@ module.exports = (client) => {
                     { body: client.commandArray },
                 );
 
-                if (process.env.GUILD_ID) {
-                    await rest.put(
-                        Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
-                        { body: client.commandArray },
-                    );
-                    console.log(`Registered commands for test guild: ${process.env.GUILD_ID}`);
-                }
-
                 console.log('Successfully reloaded application (/) commands GLOBALLY.');
             } catch (error) {
                 console.error(error);
             }
         })();
+
+        client.refreshGuildCommands = async () => {
+            const rest = new REST({ version: '9' }).setToken(process.env.Token);
+            client.guilds.cache.forEach(async (guild) => {
+                await rest.put(
+                    Routes.applicationGuildCommands(process.env.CLIENT_ID, guild.id),
+                    { body: client.commandArray },
+                ).catch(err => console.error(`Failed to update commands for guild ${guild.id}:`, err));
+            });
+            console.log(`Requested command refresh for ${client.guilds.cache.size} guilds.`);
+        };
     };
 };

@@ -26,6 +26,11 @@ process.on('uncaughtException', (err, origin) => {
     console.log(err, origin);
 });
 
+// Debug
+// client.on('debug', (info) => console.log(colors.gray(` [Debug] :: ${info}`)));
+client.on('error', (error) => console.log(colors.red(` [Error] :: ${error}`)));
+client.on('warn', (info) => console.log(colors.yellow(` [Warn] :: ${info}`)));
+
 // Handler Loading
 const functions = fs.readdirSync('./src/functions').filter(file => file.endsWith('.js'));
 

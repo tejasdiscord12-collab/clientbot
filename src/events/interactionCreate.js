@@ -5,7 +5,6 @@ module.exports = {
     name: 'interactionCreate',
     async execute(interaction, client) {
         if (interaction.isChatInputCommand()) {
-            console.log(`[Interaction] Command: /${interaction.commandName} sent by ${interaction.user.tag}`);
             const command = client.commands.get(interaction.commandName);
             if (!command) return;
 

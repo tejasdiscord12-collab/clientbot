@@ -14,7 +14,6 @@ module.exports = {
                 .addStringOption(opt => opt.setName('prize').setDescription('What are you giving away?').setRequired(true))),
     async execute(interaction) {
         await interaction.deferReply();
-        console.log(`[Giveaway] Command started by ${interaction.user.tag}`);
         if (!interaction.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             return interaction.editReply({ content: 'You need `Manage Messages` permission to use this.', ephemeral: true });
         }

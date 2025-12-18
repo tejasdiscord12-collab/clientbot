@@ -24,6 +24,8 @@ module.exports = {
                     const existingTicket = db.getTicketByOpener(interaction.guild.id, interaction.user.id);
                     if (existingTicket) return interaction.reply({ content: 'You already have an open ticket!', ephemeral: true });
 
+                    await interaction.deferReply({ ephemeral: true });
+
                     const categoryId = db.getTicketCategory(interaction.guild.id);
 
                     const channel = await interaction.guild.channels.create({
@@ -84,7 +86,7 @@ module.exports = {
                         );
 
                     await channel.send({ content: `${interaction.user}`, embeds: [embed], components: [button] });
-                    await interaction.reply({ content: `Ticket created: ${channel}`, ephemeral: true });
+                    await interaction.editReply({ content: `Ticket created: ${channel}` });
 
                 } else if (interaction.customId === 'close_ticket') {
                     const ticket = db.getTicketByChannel(interaction.channel.id);

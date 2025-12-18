@@ -13,6 +13,7 @@ module.exports = {
                 .addIntegerOption(opt => opt.setName('winners').setDescription('Number of winners').setRequired(true))
                 .addStringOption(opt => opt.setName('prize').setDescription('What are you giving away?').setRequired(true))),
     async execute(interaction) {
+        console.log(`[Giveaway] Command started by ${interaction.user.tag}`);
         if (!interaction.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             return interaction.reply({ content: 'You need `Manage Messages` permission to use this.', ephemeral: true });
         }

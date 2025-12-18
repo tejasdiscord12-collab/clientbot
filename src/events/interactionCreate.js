@@ -12,10 +12,11 @@ module.exports = {
                 await command.execute(interaction, client);
             } catch (error) {
                 console.error(error);
+                const errorMessage = `There was an error while executing this command!\n\`\`\`${error.message}\`\`\``;
                 if (interaction.replied || interaction.deferred) {
-                    await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+                    await interaction.followUp({ content: errorMessage, ephemeral: true });
                 } else {
-                    await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+                    await interaction.reply({ content: errorMessage, ephemeral: true });
                 }
             }
         } else if (interaction.isButton()) {
@@ -140,10 +141,11 @@ module.exports = {
                 }
             } catch (error) {
                 console.error('Button Interaction Error:', error);
+                const errorMessage = `There was an error processing your request.\n\`\`\`${error.message}\`\`\``;
                 if (interaction.replied || interaction.deferred) {
-                    await interaction.followUp({ content: 'There was an error processing your request.', ephemeral: true });
+                    await interaction.followUp({ content: errorMessage, ephemeral: true });
                 } else {
-                    await interaction.reply({ content: 'There was an error processing your request.', ephemeral: true });
+                    await interaction.reply({ content: errorMessage, ephemeral: true });
                 }
             }
         }

@@ -1,5 +1,6 @@
 const { PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder } = require('discord.js');
 const db = require('../database');
+const fs = require('fs');
 
 const usersMap = new Map();
 const LIMIT = 5;
@@ -57,16 +58,25 @@ module.exports = {
             // Temporarily removed permissions check for testing
             // if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator)) return;
 
-            const imagePath = '/Users/tejas/.gemini/antigravity/brain/ca258d96-5c9d-49b3-9672-84441dc6f4b7/uploaded_image_1766042332585.jpg';
-            const attachment = new AttachmentBuilder(imagePath, { name: 'banner.jpg' });
+            const imagePath = './assets/banner.jpg';
+            let files = [];
+            try {
+                if (fs.existsSync(imagePath)) {
+                    const attachment = new AttachmentBuilder(imagePath, { name: 'banner.jpg' });
+                    files.push(attachment);
+                }
+            } catch (e) {
+                console.error('Failed to load support banner:', e.message);
+            }
 
             const embed = new EmbedBuilder()
                 .setTitle('📩 Nexter Cloud | Support Center')
                 .setDescription('Welcome to the **Nexter Cloud Support System**. \n\nNeed help? Click the button below to open a ticket and our staff team will assist you shortly.\n\n**Categories:**\n• Support & Help\n• Server Reports\n• Feedback & Suggestions')
-                .setImage('attachment://banner.jpg')
                 .setFooter({ text: `Nexter Cloud • ${message.guild.name}`, iconURL: message.guild.iconURL() })
                 .setTimestamp()
                 .setColor('#5865F2');
+
+            if (files.length > 0) embed.setImage('attachment://banner.jpg');
 
             const button = new ActionRowBuilder()
                 .addComponents(

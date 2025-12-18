@@ -8,12 +8,34 @@ if (!fs.existsSync(dbPath)) {
     fs.writeFileSync(dbPath, JSON.stringify({ warns: [], tickets: [], customCommands: [], welcomeSettings: [], statusSettings: {}, invites: [], giveaways: [], ticketSettings: [] }, null, 4));
 }
 
+const defaultDB = {
+    warns: [],
+    tickets: [],
+    customCommands: [],
+    welcomeSettings: [],
+    statusSettings: {},
+    invites: [],
+    giveaways: [],
+    ticketSettings: []
+};
+
 function readDB() {
-    return JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+    try {
+        if (!fs.existsSync(dbPath)) return { ...defaultDB };
+        const data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+        return { ...defaultDB, ...data };
+    } catch (e) {
+        console.error('Error reading database, returning defaults:', e);
+        return { ...defaultDB };
+    }
 }
 
 function writeDB(data) {
-    fs.writeFileSync(dbPath, JSON.stringify(data, null, 4));
+    try {
+        fs.writeFileSync(dbPath, JSON.stringify(data, null, 4));
+    } catch (e) {
+        console.error('Error writing database:', e);
+    }
 }
 
 module.exports = {
@@ -137,7 +159,7 @@ module.exports = {
     getCustomCommand: (guildId, name) => {
         const db = readDB();
         const searchName = name.toLowerCase().trim();
-        return db.customCommands ? db.customCommands.find(c => c.GuildID === guildId && c.CommandName.toLowerCase() === searchName) : null;
+        return (db.customCommands || []).find(c => c.GuildID === guildId && (c.CommandName || '').toLowerCase() === searchName) || null;
     },
     getAllCustomCommands: (guildId) => {
         const db = readDB();

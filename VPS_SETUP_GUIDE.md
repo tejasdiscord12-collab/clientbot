@@ -59,6 +59,38 @@ pm2 startup
 pm2 save
 ```
 
+## 📂 How to Add New Files/Commands
+When you want to add a new command or update the code, follow this professional workflow:
+
+### Option A: The Professional Way (Recommended)
+1. **On your computer:** Create the new file (e.g., `src/commands/Utility/newcommand.js`).
+2. **On your computer:** Test it locally to make sure it works!
+3. **On your computer:** Push to GitHub:
+   ```bash
+   git add .
+   git commit -m "Added new command"
+   git push
+   ```
+4. **On your VPS:** Download the changes:
+   ```bash
+   cd clientbot
+   git pull
+   pm2 restart NexterCloud
+   ```
+
+### Option B: The Quick Way (Direct on VPS)
+If you just need to make a tiny change or add a quick file:
+1. `cd clientbot/src/commands/...`
+2. Type `nano filename.js`
+3. Paste your code and save (`CTRL+O`, `Enter`, `CTRL+X`).
+4. `pm2 restart NexterCloud`
+
+### Option C: Transferring Images/Assets
+If you need to upload images for your banner:
+- Use a tool like **FileZilla** or **WinSCP**.
+- Connect using your VPS IP, Username (**root**), and Password.
+- Drag and drop files directly into the `assets` folder.
+
 ## ✅ DONE!
 - Check status: `pm2 status`
 - See live logs: `pm2 logs`

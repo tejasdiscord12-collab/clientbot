@@ -32,18 +32,28 @@ module.exports = {
         if (!channel) return;
 
         // Using the user's preferred banner
-        const imagePath = '/Users/tejas/.gemini/antigravity/brain/ca258d96-5c9d-49b3-9672-84441dc6f4b7/uploaded_image_1766042332585.jpg';
-        const attachment = new AttachmentBuilder(imagePath, { name: 'welcome-banner.jpg' });
+        // Using a safe fallback for the banner image
+        const imagePath = './assets/banner.jpg'; // Recommended place for assets
+        let files = [];
+        try {
+            if (fs.existsSync(imagePath)) {
+                const attachment = new AttachmentBuilder(imagePath, { name: 'welcome-banner.jpg' });
+                files.push(attachment);
+            }
+        } catch (e) {
+            console.error('Failed to load welcome banner:', e.message);
+        }
 
         const embed = new EmbedBuilder()
             .setTitle(`Welcome to ${member.guild.name}!`)
             .setDescription(`Hello ${member}, welcome to the server! We're glad to have you here. \n\n**Invited by:** ${inviterText}\n\nMake sure to read the rules and enjoy your stay!`)
-            .setImage('attachment://welcome-banner.jpg')
             .setColor('#5865F2')
             .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
             .setFooter({ text: `Member #${member.guild.memberCount}`, iconURL: member.guild.iconURL() })
             .setTimestamp();
 
-        await channel.send({ content: `Welcome ${member}!`, embeds: [embed], files: [attachment] });
+        if (files.length > 0) embed.setImage('attachment://welcome-banner.jpg');
+
+        await channel.send({ content: `Welcome ${member}!`, embeds: [embed], files: files });
     }
 };

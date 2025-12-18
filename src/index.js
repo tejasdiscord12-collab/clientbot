@@ -15,6 +15,7 @@ const client = new Client({
 
 client.commands = new Collection();
 client.events = new Collection();
+client.invites = new Collection();
 
 // Error Handling
 process.on('unhandledRejection', (reason, p) => {

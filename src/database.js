@@ -1,0 +1,162 @@
+const fs = require('fs');
+const path = require('path');
+
+const dbPath = path.join(__dirname, '../database.json');
+
+// Initialize DB file if not exists
+if (!fs.existsSync(dbPath)) {
+    fs.writeFileSync(dbPath, JSON.stringify({ warns: [], tickets: [], customCommands: [], welcomeSettings: [], statusSettings: {} }, null, 4));
+}
+
+function readDB() {
+    return JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+}
+
+function writeDB(data) {
+    fs.writeFileSync(dbPath, JSON.stringify(data, null, 4));
+}
+
+module.exports = {
+    // Warns
+    addWarn: (guildId, userId, userTag, executerId, executerTag, reason) => {
+        const db = readDB();
+        if (!db.warns) db.warns = [];
+
+        let userWarns = db.warns.find(w => w.GuildID === guildId && w.UserID === userId);
+
+        const newWarn = {
+            ExecuterID: executerId,
+            ExecuterTag: executerTag,
+            Reason: reason,
+            Date: new Date().toLocaleString()
+        };
+
+        if (userWarns) {
+            userWarns.Content.push(newWarn);
+        } else {
+            db.warns.push({
+                GuildID: guildId,
+                UserID: userId,
+                UserTag: userTag,
+                Content: [newWarn]
+            });
+        }
+        writeDB(db);
+    },
+    getWarns: (guildId, userId) => {
+        const db = readDB();
+        return db.warns ? db.warns.find(w => w.GuildID === guildId && w.UserID === userId) : null;
+    },
+
+    // Tickets
+    createTicket: (ticketData) => {
+        const db = readDB();
+        if (!db.tickets) db.tickets = [];
+        db.tickets.push(ticketData);
+        writeDB(db);
+    },
+    getTicketByOpener: (guildId, userId) => {
+        const db = readDB();
+        return db.tickets ? db.tickets.find(t => t.GuildID === guildId && t.OpenBy === userId && !t.Closed) : null;
+    },
+    getTicketByChannel: (channelId) => {
+        const db = readDB();
+        return db.tickets ? db.tickets.find(t => t.ChannelID === channelId) : null;
+    },
+    closeTicket: (channelId) => {
+        const db = readDB();
+        if (!db.tickets) return;
+        const ticket = db.tickets.find(t => t.ChannelID === channelId);
+        if (ticket) {
+            ticket.Closed = true;
+            writeDB(db);
+        }
+    },
+    claimTicket: (channelId, userId) => {
+        const db = readDB();
+        if (!db.tickets) return;
+        const ticket = db.tickets.find(t => t.ChannelID === channelId);
+        if (ticket) {
+            ticket.Claimed = true;
+            ticket.ClaimedBy = userId;
+            writeDB(db);
+        }
+    },
+    lockTicket: (channelId) => {
+        const db = readDB();
+        if (!db.tickets) return;
+        const ticket = db.tickets.find(t => t.ChannelID === channelId);
+        if (ticket) {
+            ticket.Locked = true;
+            writeDB(db);
+        }
+    },
+    unlockTicket: (channelId) => {
+        const db = readDB();
+        if (!db.tickets) return;
+        const ticket = db.tickets.find(t => t.ChannelID === channelId);
+        if (ticket) {
+            ticket.Locked = false;
+            writeDB(db);
+        }
+    },
+
+    // Custom Commands
+    addCustomCommand: (guildId, name, response) => {
+        const db = readDB();
+        if (!db.customCommands) db.customCommands = [];
+        db.customCommands.push({ GuildID: guildId, CommandName: name, Response: response });
+        writeDB(db);
+    },
+    removeCustomCommand: (guildId, name) => {
+        const db = readDB();
+        if (!db.customCommands) return;
+        const searchName = name.toLowerCase().trim();
+        db.customCommands = db.customCommands.filter(c => !(c.GuildID === guildId && c.CommandName.toLowerCase() === searchName));
+        writeDB(db);
+    },
+    getCustomCommand: (guildId, name) => {
+        const db = readDB();
+        const searchName = name.toLowerCase().trim();
+        return db.customCommands ? db.customCommands.find(c => c.GuildID === guildId && c.CommandName.toLowerCase() === searchName) : null;
+    },
+    getAllCustomCommands: (guildId) => {
+        const db = readDB();
+        return db.customCommands ? db.customCommands.filter(c => c.GuildID === guildId) : [];
+    },
+
+    // Welcome Settings
+    setWelcomeChannel: (guildId, channelId) => {
+        const db = readDB();
+        if (!db.welcomeSettings) db.welcomeSettings = [];
+        const index = db.welcomeSettings.findIndex(s => s.GuildID === guildId);
+        if (index !== -1) {
+            db.welcomeSettings[index].ChannelID = channelId;
+        } else {
+            db.welcomeSettings.push({ GuildID: guildId, ChannelID: channelId });
+        }
+        writeDB(db);
+    },
+    getWelcomeChannel: (guildId) => {
+        const db = readDB();
+        if (!db.welcomeSettings) return null;
+        const settings = db.welcomeSettings.find(s => s.GuildID === guildId);
+        return settings ? settings.ChannelID : null;
+    },
+
+    // Status Settings
+    setStatusSettings: (guildId, channelId, messageId) => {
+        const db = readDB();
+        if (!db.statusSettings) db.statusSettings = {};
+        db.statusSettings[guildId] = { ChannelID: channelId, MessageID: messageId };
+        writeDB(db);
+    },
+    getStatusSettings: (guildId) => {
+        const db = readDB();
+        return db.statusSettings ? db.statusSettings[guildId] : null;
+    },
+    getAllStatusSettings: () => {
+        const db = readDB();
+        return db.statusSettings || {};
+    }
+};

@@ -128,11 +128,14 @@ module.exports = {
         }
 
         const ticket = db.getTicketByChannel(channel.id);
+        console.log(`[Ticket Command] Subcommand: ${subcommand}, Ticket data found: ${!!ticket}`);
         if (!ticket && !['setup', 'set-category', 'set-section', 'support-role'].includes(subcommand)) {
+            console.log(`[Ticket Command] Aborting: Not a ticket channel and not a setup command.`);
             return await interaction.editReply({ content: 'This is not a ticket channel!' });
         }
 
         if (subcommand === 'add') {
+            console.log(`[Ticket Command] Adding user to ticket...`);
             const member = options.getMember('user');
             if (!member) return await interaction.editReply({ content: 'Member not found!' });
             await channel.permissionOverwrites.edit(member.id, {
@@ -140,6 +143,7 @@ module.exports = {
                 SendMessages: true,
                 ReadMessageHistory: true
             });
+            console.log(`[Ticket Command] User ${member.user.tag} added.`);
             return await interaction.editReply({ content: `Added ${member} to the ticket.` });
         }
 
@@ -152,11 +156,13 @@ module.exports = {
 
         if (subcommand === 'role') {
             const role = options.getRole('role');
+            console.log(`[Ticket Command] Adding role ${role.name} to ticket...`);
             await channel.permissionOverwrites.edit(role.id, {
                 ViewChannel: true,
                 SendMessages: true,
                 ReadMessageHistory: true
             });
+            console.log(`[Ticket Command] Role ${role.name} added.`);
             return await interaction.editReply({ content: `Added ${role} to the ticket.` });
         }
 

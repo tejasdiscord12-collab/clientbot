@@ -4,14 +4,18 @@ const db = require('../database');
 module.exports = {
     name: 'interactionCreate',
     async execute(interaction, client) {
+        console.log(`[Interaction] type: ${interaction.type}, id: ${interaction.id}, user: ${interaction.user.tag}`);
         if (interaction.isChatInputCommand()) {
             const command = client.commands.get(interaction.commandName);
+            console.log(`[Command] ${interaction.commandName} found: ${!!command}`);
             if (!command) return;
 
             try {
+                console.log(`[Command] Executing ${interaction.commandName}...`);
                 await command.execute(interaction, client);
+                console.log(`[Command] ${interaction.commandName} executed successfully.`);
             } catch (error) {
-                console.error(error);
+                console.error(`[Command Error] ${interaction.commandName}:`, error);
                 const errorMessage = `There was an error while executing this command!\n\`\`\`${error.message}\`\`\``;
                 if (interaction.replied || interaction.deferred) {
                     await interaction.followUp({ content: errorMessage, ephemeral: true });

@@ -129,9 +129,12 @@ module.exports = {
 
         const ticket = db.getTicketByChannel(channel.id);
         console.log(`[Ticket Command] Subcommand: ${subcommand}, Ticket data found: ${!!ticket}`);
-        if (!ticket && !['setup', 'set-category', 'set-section', 'support-role'].includes(subcommand)) {
-            console.log(`[Ticket Command] Aborting: Not a ticket channel and not a setup command.`);
-            return await interaction.editReply({ content: 'This is not a ticket channel!' });
+
+        const exemptSubcommands = ['setup', 'set-category', 'set-section', 'support-role', 'add', 'remove', 'role', 'remove-role'];
+
+        if (!ticket && !exemptSubcommands.includes(subcommand)) {
+            console.log(`[Ticket Command] Aborting: Not a ticket channel and not in exemption list: ${exemptSubcommands.join(', ')}`);
+            return await interaction.editReply({ content: 'This is not a ticket channel! You can only use commands like `claim` or `close` in a channel created by the bot.' });
         }
 
         if (subcommand === 'add') {

@@ -74,6 +74,8 @@ module.exports = {
         const { options, guild, channel, user } = interaction;
         const subcommand = options.getSubcommand();
 
+        console.log(`[Ticket Command] Executing subcommand: ${subcommand} by ${user.tag}`);
+
         // Defer all interactions to prevent "Application did not respond"
         await interaction.deferReply({ ephemeral: ['setup', 'set-category', 'set-section', 'support-role'].includes(subcommand) });
 
@@ -126,7 +128,7 @@ module.exports = {
         }
 
         const ticket = db.getTicketByChannel(channel.id);
-        if (!ticket && !['setup', 'set-category', 'support-role'].includes(subcommand)) {
+        if (!ticket && !['setup', 'set-category', 'set-section', 'support-role'].includes(subcommand)) {
             return await interaction.editReply({ content: 'This is not a ticket channel!' });
         }
 

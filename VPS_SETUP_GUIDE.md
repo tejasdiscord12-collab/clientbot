@@ -19,8 +19,8 @@ sudo apt install -y nodejs npm git
 ## Step 3: Clone your Bot
 Download your code from GitHub to the VPS:
 ```bash
-git clone https://github.com/tejasdiscord12-collab/descact-bot.git
-cd descact-bot
+git clone https://github.com/tejasdiscord12-collab/descact-bot.git clientbot
+cd clientbot
 ```
 
 ## Step 4: Install Bot Dependencies
@@ -55,7 +55,7 @@ When you push changes from your computer to GitHub:
 
 1. **On your VPS:**
    ```bash
-   cd descact-bot
+   cd clientbot
    git pull
    pm2 restart Nexter-Cloud
    ```

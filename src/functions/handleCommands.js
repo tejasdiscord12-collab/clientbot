@@ -2,7 +2,7 @@ const { REST, Routes } = require('discord.js');
 const fs = require('fs');
 
 module.exports = (client) => {
-    client.handleCommands = async (commandFolders, path) => {
+    client.handleCommands = async (commandCollection, path) => {
         client.commandArray = [];
         const folders = fs.readdirSync(path);
         for (const folder of folders) {
@@ -14,9 +14,7 @@ module.exports = (client) => {
             }
         }
 
-        const rest = new REST({
-            version: '9'
-        }).setToken(process.env.Token);
+        const rest = new REST({ version: '10' }).setToken(process.env.Token);
 
         (async () => {
             try {
@@ -32,16 +30,5 @@ module.exports = (client) => {
                 console.error(error);
             }
         })();
-
-        client.refreshGuildCommands = async () => {
-            const rest = new REST({ version: '9' }).setToken(process.env.Token);
-            client.guilds.cache.forEach(async (guild) => {
-                await rest.put(
-                    Routes.applicationGuildCommands(process.env.CLIENT_ID, guild.id),
-                    { body: client.commandArray },
-                ).catch(err => console.error(`Failed to update commands for guild ${guild.id}:`, err));
-            });
-            console.log(`Requested command refresh for ${client.guilds.cache.size} guilds.`);
-        };
     };
 };

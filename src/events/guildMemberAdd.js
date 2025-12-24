@@ -1,6 +1,5 @@
-const { EmbedBuilder, AttachmentBuilder } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const db = require('../database');
-const fs = require('fs');
 
 module.exports = {
     name: 'guildMemberAdd',
@@ -30,8 +29,8 @@ module.exports = {
                 db.addMemberInvite(member.guild.id, member.id, inviter.id);
 
                 // Fetch updated invite count
-                const inviterData = db.getInvites(member.guild.id, inviter.id);
-                inviteCount = inviterData.Total;
+                const status = db.getInvites(member.guild.id, inviter.id);
+                inviteCount = status.Total;
             }
         }
 
@@ -41,29 +40,14 @@ module.exports = {
         const channel = await member.guild.channels.fetch(channelId).catch(() => null);
         if (!channel) return;
 
-        // Using the user's preferred banner
-        // Using a safe fallback for the banner image
-        const imagePath = './assets/welcome.png'; // Recommended place for assets
-        let files = [];
-        try {
-            if (fs.existsSync(imagePath)) {
-                const attachment = new AttachmentBuilder(imagePath, { name: 'welcome.png' });
-                files.push(attachment);
-            }
-        } catch (e) {
-            console.error('Failed to load welcome banner:', e.message);
-        }
-
         const embed = new EmbedBuilder()
             .setTitle(`Welcome to ${member.guild.name}!`)
-            .setDescription(`Hello ${member}, welcome to the server! We're glad to have you here. \n\n**Invited by:** ${inviterText} (**${inviteCount}** invites)\n\nMake sure to read the rules and enjoy your stay!`)
+            .setDescription(`Hello ${member}, welcome to the server! \n\n**Invited by:** ${inviterText} (**${inviteCount}** invites)`)
             .setColor('#5865F2')
             .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
-            .setFooter({ text: `Member #${member.guild.memberCount}`, iconURL: member.guild.iconURL() })
+            .setFooter({ text: `Member #${member.guild.memberCount}` })
             .setTimestamp();
 
-        if (files.length > 0) embed.setImage('attachment://welcome.png');
-
-        await channel.send({ content: `Welcome ${member}!`, embeds: [embed], files: files });
+        await channel.send({ content: `Welcome ${member}!`, embeds: [embed] });
     }
 };

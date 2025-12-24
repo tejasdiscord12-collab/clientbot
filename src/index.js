@@ -17,7 +17,7 @@ const client = new Client({
 
 client.commands = new Collection();
 client.events = new Collection();
-client.invites = new Collection();
+client.invites = new Map();
 
 // Error Handling
 process.on('unhandledRejection', (reason, p) => {
@@ -29,8 +29,6 @@ process.on('uncaughtException', (err, origin) => {
     console.log(err, origin);
 });
 
-// Debug
-// client.on('debug', (info) => console.log(colors.gray(` [Debug] :: ${info}`)));
 client.on('error', (error) => console.log(colors.red(` [Error] :: ${error}`)));
 client.on('warn', (info) => console.log(colors.yellow(` [Warn] :: ${info}`)));
 

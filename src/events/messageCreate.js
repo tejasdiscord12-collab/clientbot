@@ -104,16 +104,16 @@ module.exports = {
             const mentionedUser = message.mentions.users.first();
             const targetUser = mentionedUser || message.author;
 
-            const stats = await db.getInvites(message.guild.id, targetUser.id);
-            const totalInvites = (stats?.regular || 0) + (stats?.bonus || 0) - (stats?.left || 0);
+            const stats = db.getInvites(message.guild.id, targetUser.id);
+            const totalInvites = stats.Total;
 
             const embed = new EmbedBuilder()
                 .setTitle(`✉️ Invites for ${targetUser.username}`)
                 .addFields(
                     { name: 'Total Invites', value: `\`${totalInvites}\``, inline: true },
-                    { name: 'Regular', value: `\`${stats?.regular || 0}\``, inline: true },
-                    { name: 'Fake', value: `\`${stats?.fake || 0}\``, inline: true },
-                    { name: 'Left', value: `\`${stats?.left || 0}\``, inline: true }
+                    { name: 'Regular', value: `\`${stats.Regular}\``, inline: true },
+                    { name: 'Fake', value: `\`${stats.Fake}\``, inline: true },
+                    { name: 'Left', value: `\`${stats.Left}\``, inline: true }
                 )
                 .setColor('#5865F2')
                 .setThumbnail(targetUser.displayAvatarURL({ dynamic: true }))

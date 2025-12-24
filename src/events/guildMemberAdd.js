@@ -30,8 +30,8 @@ module.exports = {
                 db.addMemberInvite(member.guild.id, member.id, inviter.id);
 
                 // Fetch updated invite count
-                const inviterData = await db.getInvites(member.guild.id, inviter.id);
-                inviteCount = (inviterData?.regular || 0) + (inviterData?.bonus || 0); // Simplified count logic
+                const inviterData = db.getInvites(member.guild.id, inviter.id);
+                inviteCount = inviterData.Total;
             }
         }
 

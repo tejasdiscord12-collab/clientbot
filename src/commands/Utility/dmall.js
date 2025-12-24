@@ -45,14 +45,14 @@ module.exports = {
         let filterDesc = '';
         if (targetRole) filterDesc += `\n- Only members with role: **${targetRole.name}**`;
         if (excludeRole) filterDesc += `\n- Excluding members with role: **${excludeRole.name}**`;
-        if (excludeUser) filterDesc += `\n- Excluding specific user: **${excludeUser.tag}**`;
+        if (excludeUser) filterDesc += `\n- Excluding user: **${excludeUser.tag}**`;
         if (onlyOffline) filterDesc += `\n- **Targeting Offline Members Only**`;
 
         const confirmEmbed = {
-            color: 0xffaa00,
+            color: 0x5865F2, // Use Discord Blurple for a clean look
             title: '⚠️ Mass DM Confirmation',
-            description: `You are about to send a DM to members in this server.${filterDesc || '\n- All members included.'}\n\n**Message:**\n${message}\n\n**Warning:** Sending mass DMs can lead to your bot or account being flagged for spam. A delay of 2 seconds will be added between each message.`,
-            footer: { text: 'Do you want to proceed?' }
+            description: `You are about to send a DM to members in this server.${filterDesc || '\n- All members included.'}\n\n**Message:**\n${message}\n\n**Warning:** Sending many DMs can lead to rate limits. A 2-second delay is added between each message.`,
+            footer: { text: 'Nexter Cloud Bot | Safety First' }
         };
 
         const row = new ActionRowBuilder()
@@ -81,12 +81,12 @@ module.exports = {
 
         collector.on('collect', async (i) => {
             if (i.customId === 'cancel_dm') {
-                await i.update({ content: 'Mass DM cancelled.', embeds: [], components: [] });
+                await i.update({ content: '🛑 Mass DM cancelled.', embeds: [], components: [] });
                 return collector.stop();
             }
 
             if (i.customId === 'confirm_dm') {
-                await i.update({ content: 'Starting Mass DM process... Please wait.', embeds: [], components: [] });
+                await i.update({ content: '🚀 Starting Mass DM process... Please wait.', embeds: [], components: [] });
                 collector.stop();
 
                 // 3. Start DM Process
@@ -96,22 +96,13 @@ module.exports = {
 
                     // Apply Filters
                     members = members.filter(member => {
-                        // Skip bots
                         if (member.user.bot) return false;
-
-                        // Skip excluded user
                         if (excludeUser && member.id === excludeUser.id) return false;
-
-                        // Skip members with excluded role
                         if (excludeRole && member.roles.cache.has(excludeRole.id)) return false;
-
-                        // Only Offline filter
                         if (onlyOffline) {
-                            // Presence can be null if user is offline or status not cached
                             const status = member.presence ? member.presence.status : 'offline';
                             if (status !== 'offline') return false;
                         }
-
                         return true;
                     });
 
@@ -120,7 +111,7 @@ module.exports = {
                     let failed = 0;
 
                     const statusMessage = await interaction.followUp({
-                        content: `Processing: 0/${total} sent...`,
+                        content: `⏳ Processing: 0/${total} sent...`,
                         ephemeral: true
                     });
 
@@ -131,36 +122,34 @@ module.exports = {
                             await member.send(message);
                             success++;
                         } catch (err) {
-                            console.error(`Failed to DM ${member.user.tag}:`, err.message);
                             failed++;
                         }
 
                         // Update status every 5 members or at the end
                         if (count % 5 === 0 || count === total) {
-                            await statusMessage.edit(`Processing: ${count}/${total} (Success: ${success}, Failed: ${failed})`).catch(() => { });
+                            await statusMessage.edit(`⏳ Processing: ${count}/${total} (✅ ${success} | ❌ ${failed})`).catch(() => { });
                         }
 
-                        // Delay to avoid rate limits (2 seconds)
                         if (count < total) {
                             await new Promise(resolve => setTimeout(resolve, 2000));
                         }
                     }
 
                     await interaction.followUp({
-                        content: `✅ **Mass DM Complete**\nTotal attempted: ${total}\nSuccess: ${success}\nFailed: ${failed}`,
+                        content: `✅ **Mass DM Complete**\nTotal: ${total}\nSuccess: ${success}\nFailed: ${failed}`,
                         ephemeral: true
                     });
 
                 } catch (error) {
-                    console.error('Error fetching members or processing DMs:', error);
-                    await interaction.followUp({ content: 'An error occurred during the Mass DM process.', ephemeral: true });
+                    console.error('Error processing DMs:', error);
+                    await interaction.followUp({ content: '❌ An error occurred during the Mass DM process.', ephemeral: true });
                 }
             }
         });
 
         collector.on('end', (collected, reason) => {
             if (reason === 'time') {
-                interaction.editReply({ content: 'Confirmation timed out.', embeds: [], components: [] }).catch(() => { });
+                interaction.editReply({ content: '⏰ Confirmation timed out.', embeds: [], components: [] }).catch(() => { });
             }
         });
     }

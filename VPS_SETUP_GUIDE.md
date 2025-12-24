@@ -10,7 +10,7 @@ ssh root@YOUR_VPS_IP
 *(Enter your password when asked)*
 
 ## Step 2: Install Node.js & Git
-Run these commands one by one to install the engine that runs the bot:
+Run these commands one by one:
 ```bash
 sudo apt update
 sudo apt install -y nodejs npm git
@@ -24,75 +24,44 @@ cd descact-bot
 ```
 
 ## Step 4: Install Bot Dependencies
-Install the required libraries:
 ```bash
 npm install
 ```
 
-## Step 5: Transfer Secret Files (EXTREMELY IMPORTANT)
-Since GitHub doesn't have your `.env` (Token) or `database.json`, you need to create them manually on the VPS.
+## Step 5: Secret Files
+Create your `.env` and `database.json` manually on the VPS.
 
-### 5a. Create .env:
+### Create .env:
 1. Type: `nano .env`
-2. Paste your local `.env` content (Token, Client ID, etc.)
-3. Press `CTRL + O`, then `Enter` to save.
-4. Press `CTRL + X` to exit.
+2. Paste your local `.env` content.
+3. Save: `CTRL + O`, `Enter`.
+4. Exit: `CTRL + X`.
 
-### 5b. Create database.json:
-1. Type: `nano database.json`
-2. Paste the content of your local `database.json`.
-3. Press `CTRL + O`, then `Enter` to save.
-4. Press `CTRL + X` to exit.
-
-## Step 6: Set up 24/7 Mode (PM2)
-This will keep the bot alive forever:
+## Step 6: 24/7 Mode (PM2)
 ```bash
-# Install the process manager
+# Install PM2
 npm install pm2 -g
 
 # Start the bot
 pm2 start src/index.js --name "Nexter-Cloud"
 
-# Make it restart if the VPS reboots
+# Set up auto-restart
 pm2 startup
-# (Copy and paste the command PM2 shows you in the terminal)
 pm2 save
 ```
 
-## 📂 How to Add New Files/Commands
-When you want to add a new command or update the code, follow this professional workflow:
+## 📂 How to Update
+When you push changes from your computer to GitHub:
 
-### Option A: The Professional Way (Recommended)
-1. **On your computer:** Create the new file (e.g., `src/commands/Utility/newcommand.js`).
-2. **On your computer:** Test it locally to make sure it works!
-3. **On your computer:** Push to GitHub:
-   ```bash
-   git add .
-   git commit -m "Added new command"
-   git push
-   ```
-4. **On your VPS:** Download the changes:
+1. **On your VPS:**
    ```bash
    cd descact-bot
    git pull
    pm2 restart Nexter-Cloud
    ```
 
-### Option B: The Quick Way (Direct on VPS)
-If you just need to make a tiny change or add a quick file:
-1. `cd descact-bot/src/commands/...`
-2. Type `nano filename.js`
-3. Paste your code and save (`CTRL+O`, `Enter`, `CTRL+X`).
-4. `pm2 restart Nexter-Cloud`
+### Quick Debugging
+- Status: `pm2 status`
+- Logs: `pm2 logs Nexter-Cloud`
 
-### Option C: Transferring Images/Assets
-If you need to upload images for your banner:
-- Use a tool like **FileZilla** or **WinSCP**.
-- Connect using your VPS IP, Username (**root**), and Password.
-- Drag and drop files directly into the `assets` folder.
-
-## ✅ DONE!
-- Check status: `pm2 status`
-- See live logs: `pm2 logs`
-
-Your bot is now a professional 24/7 Discord bot! 🚀💎
+Your bot is now running 24/7! 🚀

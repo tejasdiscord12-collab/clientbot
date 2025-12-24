@@ -19,8 +19,8 @@ sudo apt install -y nodejs npm git
 ## Step 3: Clone your Bot
 Download your code from GitHub to the VPS:
 ```bash
-git clone https://github.com/tejasdiscord12-collab/clientbot.git
-cd clientbot
+git clone https://github.com/tejasdiscord12-collab/descact-bot.git
+cd descact-bot/mybot
 ```
 
 ## Step 4: Install Bot Dependencies
@@ -51,7 +51,7 @@ This will keep the bot alive forever:
 npm install pm2 -g
 
 # Start the bot
-pm2 start src/index.js --name "NexterCloud"
+pm2 start src/index.js --name "DesactCore"
 
 # Make it restart if the VPS reboots
 pm2 startup
@@ -73,17 +73,17 @@ When you want to add a new command or update the code, follow this professional 
    ```
 4. **On your VPS:** Download the changes:
    ```bash
-   cd clientbot
+   cd descact-bot/mybot
    git pull
-   pm2 restart NexterCloud
+   pm2 restart DesactCore
    ```
 
 ### Option B: The Quick Way (Direct on VPS)
 If you just need to make a tiny change or add a quick file:
-1. `cd clientbot/src/commands/...`
+1. `cd descact-bot/mybot/src/commands/...`
 2. Type `nano filename.js`
 3. Paste your code and save (`CTRL+O`, `Enter`, `CTRL+X`).
-4. `pm2 restart NexterCloud`
+4. `pm2 restart DesactCore`
 
 ### Option C: Transferring Images/Assets
 If you need to upload images for your banner:

@@ -32,7 +32,7 @@ module.exports = {
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
     async execute(interaction) {
-        const message = interaction.options.getString('message');
+        const dmText = interaction.options.getString('message');
         const targetRole = interaction.options.getRole('role');
         const excludeRole = interaction.options.getRole('exclude_role');
         const excludeUser = interaction.options.getUser('exclude_user');
@@ -41,6 +41,8 @@ module.exports = {
         if (!interaction.guild) {
             return interaction.reply({ content: 'This command can only be used in a server.', ephemeral: true });
         }
+
+        console.log(`[Mass DM] Command triggered by ${interaction.user.tag}. Content: "${dmText.substring(0, 50)}..."`);
 
         // 1. Initial Confirmation Prompt
         let filterDesc = '';
@@ -52,7 +54,7 @@ module.exports = {
         const confirmEmbed = {
             color: 0x5865F2, // Use Discord Blurple for a clean look
             title: '⚠️ Mass DM Confirmation',
-            description: `You are about to send a DM to members in this server.${filterDesc || '\n- All members included.'}\n\n**Message:**\n${message}\n\n**Warning:** Sending many DMs can lead to rate limits. A 2-second delay is added between each message.`,
+            description: `You are about to send a DM to members in this server.${filterDesc || '\n- All members included.'}\n\n**Message:**\n${dmText}\n\n**Warning:** Sending many DMs can lead to rate limits. A 2-second delay is added between each message.`,
             footer: { text: 'Nexter Cloud Bot | Safety First' }
         };
 
@@ -111,6 +113,8 @@ module.exports = {
                     let success = 0;
                     let failed = 0;
 
+                    console.log(`[Mass DM] Starting to DM ${total} members.`);
+
                     const statusMessage = await interaction.followUp({
                         content: `⏳ Processing: 0/${total} sent...`,
                         ephemeral: true
@@ -120,10 +124,13 @@ module.exports = {
                     for (const [id, member] of members) {
                         count++;
                         try {
-                            await member.send(message);
+                            // Ensure dmText is used here, captured from outer scope
+                            await member.send(dmText);
                             success++;
+                            console.log(`[Mass DM] Sent to ${member.user.tag} (${count}/${total})`);
                         } catch (err) {
                             failed++;
+                            console.error(`[Mass DM] Failed to send to ${member.user.tag}: ${err.message}`);
                         }
 
                         // Update status every 5 members or at the end
@@ -135,6 +142,8 @@ module.exports = {
                             await new Promise(resolve => setTimeout(resolve, 2000));
                         }
                     }
+
+                    console.log(`[Mass DM] Completed. Success: ${success}, Failed: ${failed}`);
 
                     await interaction.followUp({
                         content: `✅ **Mass DM Complete**\nTotal: ${total}\nSuccess: ${success}\nFailed: ${failed}`,

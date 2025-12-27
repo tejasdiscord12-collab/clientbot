@@ -1,6 +1,6 @@
 # 🚀 Full Step-by-Step VPS Setup Guide
 
-Follow these steps to get your **Desact.Core Bot** running 24/7 on a VPS (Ubuntu/Linux).
+Follow these steps to get your **Nexter Cloud 2 Bot** running 24/7 on a VPS (Ubuntu/Linux).
 
 ## Step 1: Login to your VPS
 Use a terminal (like Terminal on Mac or PowerShell on Windows) to log in:
@@ -51,7 +51,7 @@ This will keep the bot alive forever:
 npm install pm2 -g
 
 # Start the bot
-pm2 start src/index.js --name "Desact-Core"
+pm2 start src/index.js --name "Nexter-Cloud-2"
 
 # Make it restart if the VPS reboots
 pm2 startup
@@ -75,7 +75,7 @@ When you want to add a new command or update the code, follow this professional 
    ```bash
    cd clientbot
    git pull
-   pm2 restart Desact-Core
+   pm2 restart Nexter-Cloud-2
    ```
 
 ### Option B: The Quick Way (Direct on VPS)

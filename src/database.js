@@ -128,5 +128,51 @@ module.exports = {
         if (userWarns) userWarns.Content.push(newWarn);
         else db.warns.push({ GuildID: guildId, UserID: userId, UserTag: userTag, Content: [newWarn] });
         writeDB(db);
+    },
+
+    // Tickets
+    createTicket: (guildId, ticketId, channelId, type, openBy) => {
+        const db = readDB();
+        db.tickets.push({
+            GuildID: guildId,
+            TicketID: ticketId,
+            ChannelID: channelId,
+            Closed: false,
+            Locked: false,
+            Type: type,
+            Claimed: false,
+            ClaimedBy: null,
+            OpenBy: openBy
+        });
+        writeDB(db);
+    },
+    getOpenTicket: (guildId, userId) => {
+        const db = readDB();
+        return db.tickets.find(t => t.GuildID === guildId && t.OpenBy === userId && !t.Closed) || null;
+    },
+    getTicketByChannel: (guildId, channelId) => {
+        const db = readDB();
+        return db.tickets.find(t => t.GuildID === guildId && t.ChannelID === channelId) || null;
+    },
+    getTicketCount: (guildId) => {
+        const db = readDB();
+        return db.tickets.filter(t => t.GuildID === guildId).length;
+    },
+    closeTicket: (guildId, channelId) => {
+        const db = readDB();
+        const ticket = db.tickets.find(t => t.GuildID === guildId && t.ChannelID === channelId);
+        if (ticket) {
+            ticket.Closed = true;
+            writeDB(db);
+        }
+    },
+    claimTicket: (guildId, channelId, userId) => {
+        const db = readDB();
+        const ticket = db.tickets.find(t => t.GuildID === guildId && t.ChannelID === channelId);
+        if (ticket) {
+            ticket.Claimed = true;
+            ticket.ClaimedBy = userId;
+            writeDB(db);
+        }
     }
 };
